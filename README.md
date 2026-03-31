@@ -3,65 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MiniTerraria | 2D Sandbox Survival</title>
-    <meta name="description" content="A browser-based 2D survival game inspired by Terraria. Mine, craft, and fight bosses!">
-    
+    <title>Terraria: Survival Web Mobile</title>
     <style>
-        :root { --primary: #2ecc71; --accent: #f1c40f; --danger: #ff4757; }
-        body { margin: 0; overflow: hidden; background: #0c0c1a; font-family: 'Segoe UI', sans-serif; color: white; touch-action: none; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; touch-action: none; }
         canvas { display: block; cursor: crosshair; }
-        
-        /* UI Panels */
-        .ui-panel { position: absolute; background: rgba(0,0,0,0.85); border: 1px solid #555; padding: 12px; border-radius: 8px; pointer-events: none; z-index: 10; backdrop-filter: blur(4px); }
+        .ui-panel { position: absolute; background: rgba(0,0,0,0.85); border: 1px solid #555; padding: 12px; border-radius: 8px; pointer-events: none; z-index: 10; }
         .stats { top: 10px; left: 10px; width: 190px; }
         .crafting { top: 160px; right: 10px; width: 160px; pointer-events: auto; }
         .map-box { top: 10px; right: 10px; border: 2px solid #444; }
-        
-        /* Menu Overlay */
         #menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #2c3e50, #000); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
-        #menu-overlay h1 { font-size: 50px; color: var(--primary); text-shadow: 4px 4px #000; margin-bottom: 10px; letter-spacing: 2px; }
-        .menu-btn { background: #27ae60; color: white; border: none; padding: 15px 40px; margin: 10px; cursor: pointer; font-size: 20px; border-radius: 8px; transition: 0.2s; pointer-events: auto; font-weight: bold; box-shadow: 0 4px #1e8449; }
-        .menu-btn:active { transform: translateY(2px); box-shadow: 0 2px #1e8449; }
-
-        /* Hotbar */
-        .hotbar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 10px; pointer-events: auto; z-index: 10; border: 1px solid #444; }
-        .slot { width: 44px; height: 44px; border: 2px solid #444; display: flex; align-items: center; justify-content: center; background: #222; position: relative; cursor: pointer; font-size: 20px; border-radius: 4px; }
-        .active { border-color: var(--accent); background: #555; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
-        .count { position: absolute; bottom: 1px; right: 3px; font-weight: bold; font-size: 11px; color: #fff; text-shadow: 1px 1px #000; }
-        
-        #hp-bar { width: 100%; height: 12px; background: #333; margin-top: 5px; border-radius: 6px; overflow: hidden; border: 1px solid #000; }
-        #hp-fill { height: 100%; background: var(--danger); width: 100%; transition: width 0.3s; }
-        .craft-btn { background: #2980b9; color: white; border: none; padding: 8px; margin: 3px 0; cursor: pointer; width: 100%; font-size: 12px; border-radius: 4px; font-weight: bold; }
+        #menu-overlay h1 { font-size: 40px; color: #2ecc71; text-shadow: 3px 3px #000; margin-bottom: 20px; }
+        .menu-btn { background: #27ae60; color: white; border: none; padding: 15px 40px; margin: 10px; cursor: pointer; font-size: 20px; border-radius: 5px; transition: 0.2s; pointer-events: auto; }
+        .hotbar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 10px; pointer-events: auto; z-index: 10; }
+        .slot { width: 44px; height: 44px; border: 2px solid #444; display: flex; align-items: center; justify-content: center; background: #222; position: relative; cursor: pointer; font-size: 20px; }
+        .active { border-color: #f1c40f; background: #555; box-shadow: 0 0 10px #f1c40f; }
+        .count { position: absolute; bottom: 1px; right: 3px; font-weight: bold; font-size: 11px; color: #fff; }
+        #hp-bar { width: 100%; height: 12px; background: #333; margin-top: 5px; border-radius: 6px; overflow: hidden; }
+        #hp-fill { height: 100%; background: #ff4757; width: 100%; transition: width 0.3s; }
+        .craft-btn { background: #2980b9; color: white; border: none; padding: 6px; margin: 3px 0; cursor: pointer; width: 100%; font-size: 12px; border-radius: 4px; }
         .save-btn { background: #8e44ad; }
-
-        /* Mobile Controls */
-        .mobile-controls { position: absolute; bottom: 30px; left: 20px; display: flex; gap: 15px; z-index: 20; }
-        .m-btn { width: 75px; height: 75px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .jump-btn { position: absolute; bottom: 30px; right: 20px; width: 90px; height: 90px; background: rgba(46, 204, 113, 0.2); font-weight: bold; font-size: 16px; border: 2px solid var(--primary); }
-
-        footer { position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 10px; color: rgba(255,255,255,0.3); pointer-events: none; }
-
-        @media (min-width: 1025px) { .mobile-controls, .jump-btn { display: none !important; } }
-        @media (max-width: 768px) {
-            .hotbar { bottom: 120px; scale: 0.9; }
-            .crafting { top: auto; bottom: 190px; right: 10px; scale: 0.8; }
-            .stats { scale: 0.8; top: 5px; left: 5px; }
-            .map-box { scale: 0.8; top: 5px; right: 5px; }
-        }
+        .mobile-controls { position: absolute; bottom: 30px; left: 20px; display: flex; gap: 20px; z-index: 20; }
+        .m-btn { width: 70px; height: 70px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; user-select: none; -webkit-tap-highlight-color: transparent; pointer-events: auto; }
+        .jump-btn { position: absolute; bottom: 30px; right: 20px; width: 85px; height: 85px; background: rgba(46, 204, 113, 0.2); }
+        @media (min-width: 1024px) { .mobile-controls, .jump-btn { display: none !important; } }
+        @media (max-width: 768px) { .hotbar { scale: 0.8; bottom: 110px; } .crafting { scale: 0.8; top: 10px; right: auto; left: 10px; margin-top: 150px; } }
     </style>
 </head>
 <body>
 
 <div id="menu-overlay">
-    <h1>MINI TERRARIA</h1>
-    <button class="menu-btn" onclick="startGame()">START ADVENTURE</button>
-    <button class="menu-btn save-btn" onclick="loadGame()">LOAD WORLD</button>
-    <div style="margin-top: 20px; color: #888; font-size: 14px;">WASD to Move • Click to Mine • 1-6 Tools</div>
+    <h1>TERRARIA JS</h1>
+    <button class="menu-btn" onclick="startGame()">START NEW WORLD</button>
+    <button class="menu-btn save-btn" onclick="loadGame()">LOAD SAVE</button>
 </div>
 
 <div class="mobile-controls">
-    <div class="m-btn" id="btn-left">◀</div>
-    <div class="m-btn" id="btn-right">▶</div>
+    <div class="m-btn" id="btn-left">◀️</div>
+    <div class="m-btn" id="btn-right">▶️</div>
 </div>
 <div class="m-btn jump-btn" id="btn-jump">JUMP</div>
 
@@ -69,13 +47,13 @@
     <div><b>SURVIVOR</b> HP: <span id="hp-val">100</span></div>
     <div id="hp-bar"><div id="hp-fill"></div></div>
     <div style="font-size: 11px; margin-top:5px; color:#aaa;" id="armor-txt">Armor: None</div>
-    <hr style="border: 0; border-top: 1px solid #444; margin: 8px 0;">
+    <hr style="border: 0; border-top: 1px solid #444;">
     <button class="craft-btn save-btn" onclick="saveGame()">💾 SAVE WORLD</button>
-    <div id="boss-log" style="color: var(--danger); font-weight: bold; display: none; text-align: center; margin-top: 10px; border: 1px solid var(--danger); padding: 4px;">BOSS: <span id="boss-hp">500</span></div>
+    <div id="boss-log" style="color: #ff4757; font-weight: bold; display: none; text-align: center; margin-top: 10px;">BOSS: <span id="boss-hp">500</span></div>
 </div>
 
 <div class="ui-panel map-box">
-    <canvas id="minimap" width="100" height="60"></canvas>
+    <canvas id="minimap" width="100" height="60" style="display:block; background:#111;"></canvas>
 </div>
 
 <div class="ui-panel crafting">
@@ -94,14 +72,11 @@
     <div id="s5" class="slot" onclick="setSlot(5)">⬜<div id="cnt-stone" class="count">0</div></div>
 </div>
 
-<footer>&copy; 2024 MiniTerraria.com - Built with JavaScript</footer>
-
 <canvas id="gameCanvas"></canvas>
 
 <script>
-/* CORE LOGIC */
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d', { alpha: false });
+const ctx = canvas.getContext('2d');
 const mCanvas = document.getElementById('minimap');
 const mctx = mCanvas.getContext('2d');
 
@@ -110,7 +85,7 @@ const EMPTY = 0, GRASS = 1, DIRT = 2, STONE = 3, IRON = 4;
 const COLORS = { [GRASS]:'#2ecc71', [DIRT]:'#795548', [STONE]:'#95a5a6', [IRON]:'#dcdde1' };
 
 let world = [], keys = {}, selectedTool = 1, camX = 0, camY = 0, gameTime = 0;
-let projs = [], boss = null, flash = 0, isRunning = false;
+let projs = [], enemies = [], boss = null, flash = 0, isRunning = false;
 
 const player = { 
     x: 0, y: 0, w: 20, h: 32, vx: 0, vy: 0, hp: 100, 
@@ -118,15 +93,12 @@ const player = {
     inv: { [DIRT]: 0, [STONE]: 0, [GRASS]: 0, [IRON]: 0, arrows: 15, bullets: 10 }
 };
 
-/* FUNCTIONS */
 function startGame() {
     document.getElementById('menu-overlay').style.display = 'none';
-    if(!isRunning) {
-        initWorld();
-        spawnPlayer();
-        isRunning = true;
-        requestAnimationFrame(gameLoop);
-    }
+    isRunning = true;
+    initWorld();
+    spawnPlayer();
+    requestAnimationFrame(gameLoop);
 }
 
 function initWorld() {
@@ -144,19 +116,63 @@ function initWorld() {
 function spawnPlayer() {
     player.x = (COLS / 2) * TILE;
     for (let r = 0; r < ROWS; r++) {
-        if (world[r] && world[r][50] !== EMPTY) { player.y = (r - 2) * TILE; break; }
+        if (world[r][50] !== EMPTY) { player.y = (r - 2) * TILE; break; }
+    }
+}
+
+function spawnEnemy(x, y) {
+    enemies.push({
+        x: x, y: y, w: 24, h: 18, vx: 0, vy: 0,
+        hp: 30, grounded: false, jumpTimer: Math.random() * 60, type: 'slime'
+    });
+}
+
+function updateEnemies() {
+    // Spawn slime every 5 seconds if < 5 exist
+    if (gameTime % 300 === 0 && enemies.length < 5) {
+        let spawnX = player.x + (Math.random() > 0.5 ? 500 : -500);
+        spawnEnemy(spawnX, player.y - 100);
+    }
+
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        let en = enemies[i];
+        en.jumpTimer++;
+        
+        if (en.grounded && en.jumpTimer > 80) {
+            en.vy = -8;
+            en.vx = (player.x > en.x) ? 3.5 : -3.5;
+            en.grounded = false;
+            en.jumpTimer = 0;
+        }
+
+        en.vy += 0.45;
+        en.y += en.vy;
+        en.grounded = false;
+        collide(en, 'y');
+        en.x += en.vx;
+        collide(en, 'x');
+
+        if (en.grounded) en.vx *= 0.85;
+
+        // Player collision
+        if (Math.abs(player.x - en.x) < 20 && Math.abs(player.y - en.y) < 20 && player.iFrames === 0) {
+            player.hp -= 15 * (1 - player.armor);
+            player.iFrames = 40;
+        }
+
+        if (en.hp <= 0 || en.y > ROWS * TILE) enemies.splice(i, 1);
     }
 }
 
 function saveGame() {
     const saveData = { world, player, gameTime };
-    localStorage.setItem('miniterraria_save', JSON.stringify(saveData));
-    alert("Progress Saved to Browser!");
+    localStorage.setItem('terraria_save', JSON.stringify(saveData));
+    alert("World Saved!");
 }
 
 function loadGame() {
-    const data = localStorage.getItem('miniterraria_save');
-    if (!data) return alert("No save found!");
+    const data = localStorage.getItem('terraria_save');
+    if (!data) return alert("No save file found!");
     const parsed = JSON.parse(data);
     world = parsed.world;
     Object.assign(player, parsed.player);
@@ -197,9 +213,10 @@ function update() {
     if (player.iFrames > 0) player.iFrames--;
     if (flash > 0) flash--;
 
-    // Boss Spawn
-    if (player.inv[STONE] >= 25 && !boss) {
-        boss = { x: player.x, y: player.y - 400, hp: 600, state: 'HOVER', timer: 0, vx: 0, vy: 0 };
+    updateEnemies();
+
+    if (player.inv[STONE] >= 20 && !boss) {
+        boss = { x: player.x, y: player.y - 400, hp: 500, state: 'HOVER', timer: 0, vx: 0, vy: 0 };
         document.getElementById('boss-log').style.display = 'block';
     }
 
@@ -210,7 +227,7 @@ function update() {
             if (boss.timer > 100) { boss.state = 'CHARGE'; boss.timer = 0; }
         } else {
             let a = Math.atan2(player.y - (boss.y+40), player.x - (boss.x+40));
-            boss.vx = Math.cos(a) * 11; boss.vy = Math.sin(a) * 11;
+            boss.vx = Math.cos(a) * 10; boss.vy = Math.sin(a) * 10;
             if (boss.timer > 45) { boss.state = 'HOVER'; boss.timer = 0; }
         }
         boss.x += boss.vx; boss.y += boss.vy;
@@ -228,6 +245,12 @@ function update() {
         let r = Math.floor(p.y/TILE), c = Math.floor(p.x/TILE);
         if (world[r] && world[r][c] !== EMPTY) projs.splice(i, 1);
         if (boss && Math.abs(p.x-(boss.x+40))<40 && Math.abs(p.y-(boss.y+40))<40) { boss.hp-=p.dmg; projs.splice(i,1); }
+        // Projectile hit slimes
+        enemies.forEach(en => {
+            if (p.x > en.x && p.x < en.x + en.w && p.y > en.y && p.y < en.y + en.h) {
+                en.hp -= p.dmg; projs.splice(i, 1);
+            }
+        });
     });
 
     if (player.hp <= 0 || player.y > ROWS * TILE) location.reload();
@@ -242,20 +265,23 @@ function draw() {
     ctx.save();
     ctx.translate(-camX, -camY);
 
-    // Render Blocks
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
             if (world[r][c] !== EMPTY) {
-                // Optimization: Only draw visible tiles
-                if(c*TILE > camX-TILE && c*TILE < camX+canvas.width && r*TILE > camY-TILE && r*TILE < camY+canvas.height) {
-                    ctx.fillStyle = COLORS[world[r][c]];
-                    ctx.fillRect(c * TILE, r * TILE, TILE, TILE);
-                }
+                ctx.fillStyle = COLORS[world[r][c]];
+                ctx.fillRect(c * TILE, r * TILE, TILE, TILE);
             }
         }
     }
 
     projs.forEach(p => { ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, 8, 2); });
+
+    enemies.forEach(en => {
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(en.x, en.y, en.w, en.h);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(en.x + 4, en.y + 4, 4, 4); ctx.fillRect(en.x + en.w - 8, en.y + 4, 4, 4);
+    });
 
     if (boss) {
         ctx.fillStyle = '#ff4757'; ctx.beginPath(); ctx.arc(boss.x+40, boss.y+40, 40, 0, Math.PI*2); ctx.fill();
@@ -309,11 +335,17 @@ function setSlot(n) {
 function handleInteraction(clientX, clientY) {
     if (!isRunning) return;
     const rect = canvas.getBoundingClientRect();
-    const mX = (clientX - rect.left) + camX, mY = (clientY - rect.top) + camY;
+    const mX = (clientX - rect.left) + camX;
+    const mY = (clientY - rect.top) + camY;
     const c = Math.floor(mX/TILE), r = Math.floor(mY/TILE);
 
     if (selectedTool === 1 && world[r] && world[r][c]) { player.inv[world[r][c]]++; world[r][c] = 0; }
-    else if (selectedTool === 2) { if (boss && Math.abs(mX-(boss.x+40))<70 && Math.abs(mY-(boss.y+40))<70) boss.hp -= 12; }
+    else if (selectedTool === 2) { // Sword hitting boss OR slimes
+        if (boss && Math.abs(mX-(boss.x+40))<70 && Math.abs(mY-(boss.y+40))<70) boss.hp -= 12;
+        enemies.forEach(en => {
+            if (Math.abs(mX-(en.x+en.w/2))<40 && Math.abs(mY-(en.y+en.h/2))<40) en.hp -= 15;
+        });
+    }
     else if (selectedTool === 3 && player.inv.arrows > 0) {
         let a = Math.atan2(mY - player.y, mX - player.x);
         projs.push({ x: player.x, y: player.y, vx: Math.cos(a)*12, vy: Math.sin(a)*12, dmg: 18, c: '#fff' });
@@ -330,9 +362,11 @@ function handleInteraction(clientX, clientY) {
     }
 }
 
-/* EVENT LISTENERS */
 canvas.addEventListener('mousedown', e => handleInteraction(e.clientX, e.clientY));
-canvas.addEventListener('touchstart', e => { e.preventDefault(); handleInteraction(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+canvas.addEventListener('touchstart', e => {
+    e.preventDefault(); 
+    handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: false });
 
 window.addEventListener('keydown', e => { 
     keys[e.code] = true; 
